@@ -9,3 +9,5 @@ class AccountStore @Inject constructor() {
     fun getToken(): String = "i am a token"
 
 }
+
+const val shouldRefreshToken = true

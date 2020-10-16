@@ -12,8 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.feelsokman.androidtemplate.databinding.FragmentHostBinding
 import com.feelsokman.androidtemplate.deadlocktest.ExecutorGuy
-import com.feelsokman.androidtemplate.deadlocktest.MutexGuy
+import com.feelsokman.androidtemplate.deadlocktest.RunBlockingMutexGuy
 import com.feelsokman.androidtemplate.deadlocktest.SingleGuy
+import com.feelsokman.androidtemplate.deadlocktest.SuspendMutexGuy
 import com.feelsokman.androidtemplate.di.component.AppComponent
 import com.feelsokman.androidtemplate.di.getComponent
 import com.feelsokman.androidtemplate.ui.activity.viewmodel.MainViewModel
@@ -27,15 +28,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
 import javax.inject.Inject
 
-class HostFragment : BaseFragment(), ViewBinder.Callback {
-    override fun onButtonClicked() {
-        //
-    }
+class HostFragment : BaseFragment() {
 
     @Inject internal lateinit var viewModelFactory: ViewModelFactory
     @Inject internal lateinit var workManager: WorkManager
     @Inject internal lateinit var singleGuy: SingleGuy
-    @Inject internal lateinit var mutexGuy: MutexGuy
+    @Inject internal lateinit var suspendMutexGuy: SuspendMutexGuy
+    @Inject internal lateinit var blockingMutexGuy: RunBlockingMutexGuy
     @Inject internal lateinit var executorGuy: ExecutorGuy
     private val viewModelHost by viewModels<HostViewModel> { viewModelFactory }
     private val activityViewModel by activityViewModels<MainViewModel>()
@@ -61,11 +60,11 @@ class HostFragment : BaseFragment(), ViewBinder.Callback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.single.setOnClickListener {
+        binding.singleFromDifferentThreads.setOnClickListener {
             lifecycleScope.launch {
                 val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
                 scope.launch {
-                    val jobs: List<Job> = 1.rangeTo(10).map {
+                    val jobs: List<Job> = 1.rangeTo(100).map {
                         launch {
                             singleGuy.getAuthToken()
                         }
@@ -78,11 +77,25 @@ class HostFragment : BaseFragment(), ViewBinder.Callback {
             }
         }
 
+        binding.singleUiThread.setOnClickListener {
+            lifecycleScope.launch {
+                val jobs: List<Job> = 1.rangeTo(100).map {
+                    launch {
+                        singleGuy.getAuthToken()
+                    }
+                }
+
+                jobs.forEach {
+                    it.join() // wait for all coroutines to finish
+                }
+            }
+        }
+
         binding.executor.setOnClickListener {
             lifecycleScope.launch {
                 val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
                 scope.launch {
-                    val jobs: List<Job> = 1.rangeTo(10).map {
+                    val jobs: List<Job> = 1.rangeTo(100).map {
                         launch {
                             executorGuy.getAuthToken()
                         }
@@ -95,13 +108,13 @@ class HostFragment : BaseFragment(), ViewBinder.Callback {
             }
         }
 
-        binding.mutex.setOnClickListener {
+        binding.suspendMutexDifferentThreads.setOnClickListener {
             lifecycleScope.launch {
                 val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
                 scope.launch {
-                    val jobs: List<Job> = 1.rangeTo(10).map {
+                    val jobs: List<Job> = 1.rangeTo(100).map {
                         launch {
-                            mutexGuy.getAuthToken()
+                            suspendMutexGuy.getAuthToken()
                         }
                     }
 
@@ -111,6 +124,52 @@ class HostFragment : BaseFragment(), ViewBinder.Callback {
                 }.join()
             }
         }
+
+        binding.suspendMutexUiThread.setOnClickListener {
+            lifecycleScope.launch {
+                val jobs: List<Job> = 1.rangeTo(100).map {
+                    launch {
+                        suspendMutexGuy.getAuthToken()
+                    }
+                }
+
+                jobs.forEach {
+                    it.join() // wait for all coroutines to finish
+                }
+            }
+        }
+
+        binding.blockingMutexUiThread.setOnClickListener {
+            lifecycleScope.launch {
+                val jobs: List<Job> = 1.rangeTo(100).map {
+                    launch {
+                        blockingMutexGuy.getAuthToken()
+                    }
+                }
+
+                jobs.forEach {
+                    it.join() // wait for all coroutines to finish
+                }
+            }
+        }
+
+        binding.blockingMutexDifferentThreads.setOnClickListener {
+            lifecycleScope.launch {
+                val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
+                scope.launch {
+                    val jobs: List<Job> = 1.rangeTo(100).map {
+                        launch {
+                            blockingMutexGuy.getAuthToken()
+                        }
+                    }
+
+                    jobs.forEach {
+                        it.join() // wait for all coroutines to finish
+                    }
+                }.join()
+            }
+        }
+
     }
 
     override fun onDestroyView() {

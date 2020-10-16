@@ -1,45 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="2">
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/textView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text=""
-        android:textAppearance="?attr/textAppearanceHeadline5" />
-
-    <Button
-        android:id="@+id/single"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="SINGLE"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/executor"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="EXECUTOR"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        <Button
+            android:id="@+id/singleFromDifferentThreads"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="SINGLE - DIFFERENT THREADS"
+            android:textAppearance="?attr/textAppearanceBody1" />
 
-    <Button
-        android:id="@+id/mutex"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="MUTEX"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        <Button
+            android:id="@+id/singleUiThread"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="SINGLE - UI THREAD"
+            android:textAppearance="?attr/textAppearanceBody1" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/executor"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="EXECUTOR"
+            android:textAppearance="?attr/textAppearanceBody1" />
+
+        <Button
+            android:id="@+id/suspend_mutex_different_threads"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="SUSPEND MUTEX DIFFERENT THREADS"
+            android:textAppearance="?attr/textAppearanceBody1" />
+
+        <Button
+            android:id="@+id/suspend_mutex_ui_thread"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="SUSPEND MUTEX UI THREAD"
+            android:textAppearance="?attr/textAppearanceBody1" />
+
+        <Button
+            android:id="@+id/blocking_mutex_different_threads"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="RUNBLOCKING MUTEX DIFFERENT THREADS"
+            android:textAppearance="?attr/textAppearanceBody1" />
+
+        <Button
+            android:id="@+id/blocking_mutex_ui_thread"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="RUNBLOCKING MUTEX UI THREAD"
+            android:textAppearance="?attr/textAppearanceBody1" />
+
+
+    </LinearLayout>
+
+
+</ScrollView>
