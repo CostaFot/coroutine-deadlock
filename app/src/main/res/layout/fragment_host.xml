@@ -12,16 +12,34 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="THIS IS THE HOST FRAGMENT"
+        android:text=""
         android:textAppearance="?attr/textAppearanceHeadline5" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/single"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="GO TO ANOTHER FRAGMENT"
+        android:text="SINGLE"
+        android:textAppearance="?attr/textAppearanceBody1" />
+
+    <Button
+        android:id="@+id/executor"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="EXECUTOR"
+        android:textAppearance="?attr/textAppearanceBody1" />
+
+    <Button
+        android:id="@+id/mutex"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="MUTEX"
         android:textAppearance="?attr/textAppearanceBody1" />
 
 </LinearLayout>

@@ -13,7 +13,7 @@ class ViewBinder(private val view: View, private val callback: Callback) {
         fun onButtonClicked()
     }
 
-    var button: Button = view.findViewById(R.id.button)
+    var button: Button = view.findViewById(R.id.single)
 
     init {
         button.setOnClickListener {

@@ -8,20 +8,23 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.feelsokman.androidtemplate.databinding.FragmentHostBinding
+import com.feelsokman.androidtemplate.deadlocktest.ExecutorGuy
+import com.feelsokman.androidtemplate.deadlocktest.MutexGuy
+import com.feelsokman.androidtemplate.deadlocktest.SingleGuy
 import com.feelsokman.androidtemplate.di.component.AppComponent
 import com.feelsokman.androidtemplate.di.getComponent
-import com.feelsokman.androidtemplate.extensions.logDebug
 import com.feelsokman.androidtemplate.ui.activity.viewmodel.MainViewModel
 import com.feelsokman.androidtemplate.ui.base.BaseFragment
 import com.feelsokman.androidtemplate.ui.fragments.host.viewmodel.HostViewModel
 import com.feelsokman.androidtemplate.utilities.viewmodel.ViewModelFactory
-import com.feelsokman.androidtemplate.work.DoSomethingWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newFixedThreadPoolContext
 import javax.inject.Inject
 
 class HostFragment : BaseFragment(), ViewBinder.Callback {
@@ -31,6 +34,9 @@ class HostFragment : BaseFragment(), ViewBinder.Callback {
 
     @Inject internal lateinit var viewModelFactory: ViewModelFactory
     @Inject internal lateinit var workManager: WorkManager
+    @Inject internal lateinit var singleGuy: SingleGuy
+    @Inject internal lateinit var mutexGuy: MutexGuy
+    @Inject internal lateinit var executorGuy: ExecutorGuy
     private val viewModelHost by viewModels<HostViewModel> { viewModelFactory }
     private val activityViewModel by activityViewModels<MainViewModel>()
 
@@ -51,32 +57,59 @@ class HostFragment : BaseFragment(), ViewBinder.Callback {
         return binding.root
     }
 
+    @OptIn(ObsoleteCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activityViewModel.textData.observe(viewLifecycleOwner, Observer {
-            logDebug { "HostFragment Activity string is $it" }
-        })
+        binding.single.setOnClickListener {
+            lifecycleScope.launch {
+                val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
+                scope.launch {
+                    val jobs: List<Job> = 1.rangeTo(10).map {
+                        launch {
+                            singleGuy.getAuthToken()
+                        }
+                    }
 
-        viewModelHost.textData.observe(viewLifecycleOwner) {
-            if (!it.isNullOrBlank()) {
-                binding.button.text = it
+                    jobs.forEach {
+                        it.join() // wait for all coroutines to finish
+                    }
+                }.join()
             }
         }
 
-        binding.button.setOnClickListener {
+        binding.executor.setOnClickListener {
+            lifecycleScope.launch {
+                val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
+                scope.launch {
+                    val jobs: List<Job> = 1.rangeTo(10).map {
+                        launch {
+                            executorGuy.getAuthToken()
+                        }
+                    }
 
-            // workmanager example
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .setRequiresCharging(true)
-                .build()
+                    jobs.forEach {
+                        it.join() // wait for all coroutines to finish
+                    }
+                }.join()
+            }
+        }
 
-            val uploadWorkRequest = OneTimeWorkRequestBuilder<DoSomethingWorker>()
-                .setConstraints(constraints)
-                .build()
+        binding.mutex.setOnClickListener {
+            lifecycleScope.launch {
+                val scope = CoroutineScope(newFixedThreadPoolContext(4, "synchronizationPool"))
+                scope.launch {
+                    val jobs: List<Job> = 1.rangeTo(10).map {
+                        launch {
+                            mutexGuy.getAuthToken()
+                        }
+                    }
 
-            workManager.enqueue(uploadWorkRequest)
+                    jobs.forEach {
+                        it.join() // wait for all coroutines to finish
+                    }
+                }.join()
+            }
         }
     }
 
