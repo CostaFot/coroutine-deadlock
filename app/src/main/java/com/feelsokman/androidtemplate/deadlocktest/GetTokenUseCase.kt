@@ -27,7 +27,7 @@ class GetTokenUseCase @Inject constructor(
                         return@withContext null
                     }
                     if (shouldRefreshToken()) {
-                        val token = refreshTokenServiceClient.refreshToken()
+                        val token: String? = refreshTokenServiceClient.refreshToken()
                         if (token != null) {
                             // all good, update the token in our repository
                             accountDetailsRepository.updateToken(token)

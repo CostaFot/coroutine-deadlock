@@ -2,15 +2,22 @@ package com.feelsokman.androidtemplate.deadlocktest
 
 import javax.inject.Inject
 
-class AccountDetailsRepository @Inject constructor() {
+interface AccountDetailsRepository {
+    fun isUserSignedIn(): Boolean
+    fun getToken(): String?
+    fun updateToken(token: String)
+    fun logout()
+}
 
-    fun isUserSignedIn(): Boolean = true
-    fun getToken(): String? = "a token"
-    fun updateToken(token: String) {
+class AccountDetailsRepositoryImpl @Inject constructor() : AccountDetailsRepository {
+
+    override fun isUserSignedIn(): Boolean = true
+    override fun getToken(): String? = "a token"
+    override fun updateToken(token: String) {
         // update it here
     }
 
-    fun logout() {
+    override fun logout() {
         // delete stuff
     }
 }
