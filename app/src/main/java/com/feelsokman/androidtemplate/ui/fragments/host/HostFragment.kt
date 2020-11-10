@@ -11,10 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.feelsokman.androidtemplate.databinding.FragmentHostBinding
-import com.feelsokman.androidtemplate.deadlocktest.ExecutorGuy
-import com.feelsokman.androidtemplate.deadlocktest.RunBlockingMutexGuy
-import com.feelsokman.androidtemplate.deadlocktest.SingleGuy
-import com.feelsokman.androidtemplate.deadlocktest.SuspendMutexGuy
 import com.feelsokman.androidtemplate.di.component.AppComponent
 import com.feelsokman.androidtemplate.di.getComponent
 import com.feelsokman.androidtemplate.ui.activity.viewmodel.MainViewModel
